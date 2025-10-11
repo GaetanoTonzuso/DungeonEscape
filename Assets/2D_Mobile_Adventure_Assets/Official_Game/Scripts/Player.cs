@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rb;
     private PlayerAnimation _playerAnim;
     private SpriteRenderer _spriteRenderer;
+    [SerializeField] private SpriteRenderer _swordRenderer;
     private float _move;
     private bool _resetJump = false;
     private bool _grounded = false;
@@ -41,6 +42,11 @@ public class Player : MonoBehaviour
     void Update()
     {
         Movement();
+
+        if(Input.GetKeyDown(KeyCode.Mouse0) && IsGrounded())
+        {
+            _playerAnim.Attack();
+        }
     }
 
     private void Movement()
@@ -67,10 +73,26 @@ public class Player : MonoBehaviour
         if (_move > 0)
         {
             _spriteRenderer.flipX = false;
+
+            //Sword Settings
+            _swordRenderer.flipX = false;
+            _swordRenderer.flipY = false;
+
+            Vector3 swordNewPos = _swordRenderer.transform.localPosition;
+            swordNewPos.x = 1.01f;
+            _swordRenderer.transform.localPosition = swordNewPos;
         }
         else if (_move < 0)
         {
             _spriteRenderer.flipX = true;
+
+            //Sword Settings
+            _swordRenderer.flipX = true;
+            _swordRenderer.flipY = true;
+
+            Vector3 swordNewPos = _swordRenderer.transform.localPosition;
+            swordNewPos.x = -1.01f;
+            _swordRenderer.transform.localPosition = swordNewPos;
         }
     }
 
@@ -89,12 +111,6 @@ public class Player : MonoBehaviour
         }
 
         return false;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, Vector2.down * _rayDistance);
     }
 
    private IEnumerator ResetJumpRoutine()
