@@ -13,6 +13,10 @@ public abstract class Enemy : MonoBehaviour
     protected Animator anim;
     protected SpriteRenderer spriteRenderer;
 
+    protected bool isHit = false;
+
+    protected Player player;
+
     [Header("Waypoints")]
     [SerializeField] protected Transform _pointA, _pointB;
 
@@ -29,6 +33,12 @@ public abstract class Enemy : MonoBehaviour
         {
             Debug.LogError("Sprite Renderer is NULL on: " + this.gameObject.name);
         }
+
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        if(player == null)
+        {
+            Debug.LogError("Player is NULL on: " + this.gameObject.name);
+        }
     }
 
     private void Start()
@@ -38,7 +48,11 @@ public abstract class Enemy : MonoBehaviour
 
     public virtual void Update ()
     {
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Idle")) return;
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Idle") && anim.GetBool("InCombat") == false)
+        {
+            return;
+        }
+
         Movement();
     }
 
@@ -65,6 +79,19 @@ public abstract class Enemy : MonoBehaviour
             anim.SetTrigger("Idle");
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, currentTarget, _speed * Time.deltaTime);
+        if(!isHit)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, currentTarget, _speed * Time.deltaTime);
+        }
+
+        float distance = Vector3.Distance(player.transform.position, transform.position);
+
+        if(distance > 2f)
+        {
+            isHit = false;
+            anim.SetBool("InCombat", false);
+            Debug.Log("Player is out of distance");
+        }
+
     }
 }
