@@ -8,12 +8,15 @@ public abstract class Enemy : MonoBehaviour
     protected int _health;
     [SerializeField]
     protected int _gems;
+    [SerializeField]
+    protected GameObject _gemPrefab;
 
     protected Vector3 currentTarget;
     protected Animator anim;
     protected SpriteRenderer spriteRenderer;
 
     protected bool isHit = false;
+    protected bool isDead = false;
 
     protected Player player;
 
@@ -53,7 +56,11 @@ public abstract class Enemy : MonoBehaviour
             return;
         }
 
-        Movement();
+        if(!isDead)
+        {
+            Movement();
+
+        }
     }
 
     public virtual void Movement()
@@ -90,7 +97,17 @@ public abstract class Enemy : MonoBehaviour
         {
             isHit = false;
             anim.SetBool("InCombat", false);
-            Debug.Log("Player is out of distance");
+        }
+
+        Vector3 direction = player.transform.localPosition - transform.position;
+
+        if (direction.x > 0 && anim.GetBool("InCombat"))
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if (direction.x < 0 && anim.GetBool("InCombat"))
+        {
+            spriteRenderer.flipX = true;
         }
 
     }

@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamagable
 {
     private Rigidbody2D _rb;
     private PlayerAnimation _playerAnim;
@@ -11,12 +11,17 @@ public class Player : MonoBehaviour
     private bool _resetJump = false;
     private bool _grounded = false;
 
+    [SerializeField] private int _currentDiamonds = 0;
+    public int CurrentGems { get { return _currentDiamonds; } set { _currentDiamonds = value; } }
+
     [Header("Player Settings")]
     [SerializeField] private float _speed = 5.0f;
 
     [Header("Jump Settings")]
     [SerializeField] private float _rayDistance = 0.65f;
     [SerializeField] private float _jumpForce;
+
+    public int Health { get; set;}
 
     void Start()
     {
@@ -118,5 +123,10 @@ public class Player : MonoBehaviour
         _resetJump = true;
         yield return new WaitForSeconds(0.1f);
         _resetJump = false;
+    }
+
+    public void Damage()
+    {
+        Debug.Log("Damaged player");
     }
 }
