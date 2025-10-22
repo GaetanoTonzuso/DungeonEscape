@@ -42,6 +42,8 @@ public class Player : MonoBehaviour, IDamagable
         {
             Debug.LogError("Sprite is NULL on Player");
         }
+
+        Health = 4;
     }
 
     void Update()
@@ -128,5 +130,19 @@ public class Player : MonoBehaviour, IDamagable
     public void Damage()
     {
         Debug.Log("Damaged player");
+        Health--;
+
+        if(Health <= 0 )
+        {
+            _playerAnim.Death();
+        }
     }
+
+    public void AddGems(int amount)
+    {
+        _currentDiamonds += amount;
+        UIManager.Instance.UpdateGemCount(_currentDiamonds);
+    }
+
+
 }

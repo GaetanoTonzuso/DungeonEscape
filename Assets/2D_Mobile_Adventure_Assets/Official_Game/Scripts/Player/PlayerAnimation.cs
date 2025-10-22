@@ -7,6 +7,7 @@ public class PlayerAnimation : MonoBehaviour
     private string _moveString = "Move";
     private string _jumpString = "Jumping";
     private string _attackString = "Attack";
+    private string _deathString = "Death";
 
     void Start()
     {
@@ -38,5 +39,10 @@ public class PlayerAnimation : MonoBehaviour
     {
         _anim.SetTrigger(_attackString);
         _swordAnim.SetTrigger("SwordAnimation");
+    }
+
+    public void Death()
+    {
+        _anim.SetTrigger("Death");
     }
 }

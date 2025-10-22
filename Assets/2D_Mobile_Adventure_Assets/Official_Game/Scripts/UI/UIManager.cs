@@ -19,6 +19,12 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI _gemsText;
     [SerializeField] private Image _selection;
+    [SerializeField] private TextMeshProUGUI _gemCountUI;
+
+    private void Awake()
+    {
+        _instance = this;
+    }
 
     public void OpenShop(int gemsCount)
     {
@@ -30,8 +36,15 @@ public class UIManager : MonoBehaviour
         _selection.rectTransform.anchoredPosition = new Vector2(_selection.rectTransform.anchoredPosition.x, yPos);
     }
 
-    private void Awake()
+    public void UpdateGemCount(int count)
     {
-        _instance = this;
+        _gemCountUI.text = "" + count.ToString();
     }
+
+    public void UpdateLives(int livesRemaining)
+    {
+        //loop through lives
+        //active and deactivate ui live
+    }
+
 }
