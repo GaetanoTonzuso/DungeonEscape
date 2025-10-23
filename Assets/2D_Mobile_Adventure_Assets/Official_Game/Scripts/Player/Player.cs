@@ -1,15 +1,22 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour, IDamagable
 {
     private Rigidbody2D _rb;
     private PlayerAnimation _playerAnim;
     private SpriteRenderer _spriteRenderer;
+
     [SerializeField] private SpriteRenderer _swordRenderer;
+
     private float _move;
     private bool _resetJump = false;
     private bool _grounded = false;
+    private bool _isDead = false;
+
+    private PlayerInputActions _input;
+    private Vector2 _movement;
 
     [SerializeField] private int _currentDiamonds = 0;
     public int CurrentGems { get { return _currentDiamonds; } set { _currentDiamonds = value; } }
@@ -25,20 +32,22 @@ public class Player : MonoBehaviour, IDamagable
 
     void Start()
     {
+        InputSettingsSetup();
+
         _rb = GetComponent<Rigidbody2D>();
-        if(_rb == null)
+        if (_rb == null)
         {
             Debug.LogError("RB is NULL on PLAYER");
         }
 
         _playerAnim = GetComponent<PlayerAnimation>();
-        if(_playerAnim == null )
+        if (_playerAnim == null)
         {
             Debug.LogError("PlayerAnim is NULL on Player");
         }
 
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        if(_spriteRenderer == null )
+        if (_spriteRenderer == null)
         {
             Debug.LogError("Sprite is NULL on Player");
         }
@@ -46,38 +55,62 @@ public class Player : MonoBehaviour, IDamagable
         Health = 4;
     }
 
-    void Update()
+    private void InputSettingsSetup()
     {
-        Movement();
+        //Input Settings
+        _input = new PlayerInputActions();
+        _input.Player.Enable();
 
-        if(Input.GetKeyDown(KeyCode.Mouse0) && IsGrounded())
+        _input.Player.Attack.performed += Attack_performed;
+        _input.Player.Jump.performed += Jump_performed;
+    }
+
+    private void Jump_performed(InputAction.CallbackContext obj)
+    {
+        if (IsGrounded())
+        {
+            _rb.linearVelocity = new Vector2(_movement.x, _jumpForce);
+            StartCoroutine(ResetJumpRoutine());
+            _playerAnim.Jump(true);
+        }
+    }
+    private void Attack_performed(InputAction.CallbackContext obj)
+    {    
+        if (IsGrounded())
         {
             _playerAnim.Attack();
         }
     }
 
+    void Update()
+    {
+        if (_isDead) return;
+        Movement();    
+    }
+
     private void Movement()
     {
-        _move = Input.GetAxis("Horizontal");
+        _movement = _input.Player.Movement.ReadValue<Vector2>();
+        //_move = Input.GetAxis("Horizontal");
         _grounded = IsGrounded();
 
         FlipSprite();
 
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        /*if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
-            _rb.linearVelocity = new Vector2(_move, _jumpForce);
+            _rb.linearVelocity = new Vector2(_movement.x, _jumpForce);
             StartCoroutine(ResetJumpRoutine());
             _playerAnim.Jump(true);
-        }
+        }*/
 
-        _rb.linearVelocity = new Vector2(_move * _speed, _rb.linearVelocity.y);
-        _playerAnim.Move(_move);
+        _rb.linearVelocity = new Vector2(_movement.x * _speed, _rb.linearVelocity.y);
+        _playerAnim.Move(_movement.x);
 
     }
 
     private void FlipSprite()
     {
-        if (_move > 0)
+        if (_movement.x > 0)
         {
             _spriteRenderer.flipX = false;
 
@@ -89,7 +122,7 @@ public class Player : MonoBehaviour, IDamagable
             swordNewPos.x = 1.01f;
             _swordRenderer.transform.localPosition = swordNewPos;
         }
-        else if (_move < 0)
+        else if (_movement.x < 0)
         {
             _spriteRenderer.flipX = true;
 
@@ -131,9 +164,11 @@ public class Player : MonoBehaviour, IDamagable
     {
         Debug.Log("Damaged player");
         Health--;
+        UIManager.Instance.UpdateLives(Health);
 
-        if(Health <= 0 )
+        if(Health < 1 && !_isDead)
         {
+            _isDead = true;
             _playerAnim.Death();
         }
     }
@@ -143,6 +178,4 @@ public class Player : MonoBehaviour, IDamagable
         _currentDiamonds += amount;
         UIManager.Instance.UpdateGemCount(_currentDiamonds);
     }
-
-
 }

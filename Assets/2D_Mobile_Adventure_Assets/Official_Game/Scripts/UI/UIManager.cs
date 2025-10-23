@@ -20,6 +20,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _gemsText;
     [SerializeField] private Image _selection;
     [SerializeField] private TextMeshProUGUI _gemCountUI;
+    [SerializeField] private GameObject[] _livesUi;
 
     private void Awake()
     {
@@ -45,6 +46,11 @@ public class UIManager : MonoBehaviour
     {
         //loop through lives
         //active and deactivate ui live
+        for(int i = 0; i < _livesUi.Length; i++)
+        {
+            if(livesRemaining == i)
+            _livesUi[i].SetActive(false);
+        }
     }
 
 }

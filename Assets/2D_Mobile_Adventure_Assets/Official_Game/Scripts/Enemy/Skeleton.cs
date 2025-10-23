@@ -14,18 +14,21 @@ public class Skeleton : Enemy, IDamagable
 
     public void Damage()
     {
-        Debug.Log("Damage");
-        Health--;
-        anim.SetTrigger("Hit");
-        isHit = true;
-        anim.SetBool("InCombat",true);
-
-        if(Health < 1 && !isDead)
+        if (!isDead)
         {
-            isDead = true;
-            anim.SetTrigger("Death");
-            GameObject gem = Instantiate(_gemPrefab, transform.position, Quaternion.identity);
-            gem.GetComponent<Diamond>().gems = base._gems;
+            Debug.Log("Damage");
+            Health--;
+            anim.SetTrigger("Hit");
+            isHit = true;
+            anim.SetBool("InCombat", true);
+
+            if (Health < 1)
+            {
+                isDead = true;
+                anim.SetTrigger("Death");
+                GameObject gem = Instantiate(_gemPrefab, transform.position, Quaternion.identity);
+                gem.GetComponent<Diamond>().gems = base._gems;
+            }
         }
     }
 }
